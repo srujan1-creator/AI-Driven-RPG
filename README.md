@@ -1,6 +1,8 @@
 # Neural Link | Cyberpunk AI-Driven RPG Deck
 
-Welcome to **Neural Link**, a grim cyber-noir RPG terminal deck set in the rain-slicked neon streets of Neo-Tokyo. 
+Welcome to **Neural Link**, a grim cyber-noir RPG terminal deck set in the rain-slicked neon streets of Neo-Tokyo.
+
+🎮 **Live Deployment**: [https://ai-driven-rpg.onrender.com/login.html](https://ai-driven-rpg.onrender.com/login.html)
 
 This interactive game combines text-based RPG mechanics with an immersive **Graphic Comic Mode**, active **CCTV surveillance camera visualizers**, character profiles, and real-time hacking feedback powered by the **Gemini AI Core**.
 
