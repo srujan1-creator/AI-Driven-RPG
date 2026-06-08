@@ -2,5 +2,6 @@ services:
   - type: web
     name: ai-driven-rpg
     env: python
+    plan: free
     buildCommand: "echo 'No build required'"
     startCommand: "python -u server.py"
