@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neural Link | Access Gateway</title>
+  <meta name="description" content="Access gateway for the Neo-Tokyo Neural Link terminal deck. Authenticate or register a new operative.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+  <div class="scanlines"></div>
+
+  <!-- Ambient background glow particles -->
+  <div class="glow-bg-1"></div>
+  <div class="glow-bg-2"></div>
+
+  <div class="login-wrapper">
+    <div class="login-box glass-card">
+      <header class="login-header">
+        <div class="gateway-logo"><i class="fa-solid fa-network-wired"></i> NEURAL_LINK</div>
+        <span class="gateway-subtitle">SECURE GATEWAY ACCESS</span>
+      </header>
+
+      <!-- Toggle Actions -->
+      <div class="login-toggle-container">
+        <button id="toggle-login-btn" class="toggle-btn active">ACCESS SYSTEM</button>
+        <button id="toggle-register-btn" class="toggle-btn">REGISTER KEY</button>
+      </div>
+
+      <!-- Main Form -->
+      <form id="gateway-form" class="gateway-form">
+        <!-- Text credentials -->
+        <div class="form-group">
+          <label for="username-input">USER NAME</label>
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-user input-icon"></i>
+            <input type="text" id="username-input" class="form-control" placeholder="OPERATIVE_ID..." required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password-input">SECURE PASSKEY</label>
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" id="password-input" class="form-control" placeholder="••••••••" required>
+            <button id="login-toggle-eye" type="button" class="btn-eye-toggle">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Class Selector Panel (Visible only during Registration) -->
+        <div class="class-selector-section" id="register-class-section" style="display: none;">
+          <label class="section-label">SELECT COGNITIVE MATRIX CLASS</label>
+          
+          <div class="class-cards-grid">
+            
+            <!-- Class Card 1: Operative -->
+            <div class="class-card active" data-class="operative">
+              <div class="class-portrait-wrapper">
+                <img src="cyberpunk_operative_portrait.png" alt="Operative Elias Vance">
+              </div>
+              <div class="class-card-info">
+                <div class="class-card-name">ELIAS VANCE</div>
+                <div class="class-card-spec">[OPERATIVE]</div>
+                <div class="class-card-stats">STR 64 | INT 88 | CHA 42</div>
+                <div class="class-card-start">Starts: District 09</div>
+              </div>
+            </div>
+
+            <!-- Class Card 2: Netrunner -->
+            <div class="class-card" data-class="netrunner">
+              <div class="class-portrait-wrapper">
+                <img src="cyberpunk_netrunner_portrait.png" alt="Netrunner Kira Thorn">
+              </div>
+              <div class="class-card-info">
+                <div class="class-card-name">KIRA THORN</div>
+                <div class="class-card-spec">[NETRUNNER]</div>
+                <div class="class-card-stats">STR 38 | INT 95 | CHA 47</div>
+                <div class="class-card-start">Starts: Kabuki Market</div>
+              </div>
+            </div>
+
+            <!-- Class Card 3: Street Samurai -->
+            <div class="class-card" data-class="samurai">
+              <div class="class-portrait-wrapper">
+                <img src="cyberpunk_samurai_portrait.png" alt="Samurai Jaxen Sterling">
+              </div>
+              <div class="class-card-info">
+                <div class="class-card-name">JAXEN STERLING</div>
+                <div class="class-card-spec">[SAMURAI]</div>
+                <div class="class-card-stats">STR 90 | INT 45 | CHA 45</div>
+                <div class="class-card-start">Starts: Chiba slums</div>
+              </div>
+            </div>
+
+          </div>
+          <input type="hidden" id="selected-class-input" value="operative">
+        </div>
+
+        <button type="submit" class="btn-submit-gateway" id="gateway-submit-btn">
+          &lt; AUTHENTICATE OPERATIVE &gt;
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Gateway Spinner -->
+  <div class="loader-overlay" id="gateway-loader" style="display: none;">
+    <div class="loader-content">
+      <div class="cyber-spinner"></div>
+      <span class="loader-text" id="loader-text-status">Querying terminal servers...</span>
+    </div>
+  </div>
+
+  <!-- Alert System -->
+  <div id="toast-notification" class="toast-message" style="display: none;"></div>
+
+  <!-- Script logic for login/register toggling & fetch calls -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let isRegisterMode = false;
+
+      const toggleLoginBtn = document.getElementById("toggle-login-btn");
+      const toggleRegisterBtn = document.getElementById("toggle-register-btn");
+      const registerSection = document.getElementById("register-class-section");
+      const submitBtn = document.getElementById("gateway-submit-btn");
+      const classInput = document.getElementById("selected-class-input");
+      const classCards = document.querySelectorAll(".class-card");
+      
+      const usernameInput = document.getElementById("username-input");
+      const passwordInput = document.getElementById("password-input");
+      const form = document.getElementById("gateway-form");
+      const loader = document.getElementById("gateway-loader");
+      const loaderText = document.getElementById("loader-text-status");
+
+      // Password visibility toggle
+      const eyeBtn = document.getElementById("login-toggle-eye");
+      eyeBtn.addEventListener("click", () => {
+        const icon = eyeBtn.querySelector("i");
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          icon.className = "fa-solid fa-eye-slash";
+        } else {
+          passwordInput.type = "password";
+          icon.className = "fa-solid fa-eye";
+        }
+      });
+
+      // Toggling Auth Modes
+      toggleLoginBtn.addEventListener("click", () => {
+        isRegisterMode = false;
+        toggleLoginBtn.classList.add("active");
+        toggleRegisterBtn.classList.remove("active");
+        registerSection.style.display = "none";
+        submitBtn.innerHTML = "&lt; AUTHENTICATE OPERATIVE &gt;";
+      });
+
+      toggleRegisterBtn.addEventListener("click", () => {
+        isRegisterMode = true;
+        toggleRegisterBtn.classList.add("active");
+        toggleLoginBtn.classList.remove("active");
+        registerSection.style.display = "block";
+        submitBtn.innerHTML = "&lt; INITIALIZE BIOMETRICS &gt;";
+      });
+
+      // Class Card Selection
+      classCards.forEach(card => {
+        card.addEventListener("click", () => {
+          classCards.forEach(c => c.classList.remove("active"));
+          card.classList.add("active");
+          classInput.value = card.getAttribute("data-class");
+        });
+      });
+
+      // Handling Form Submission
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const charClass = classInput.value;
+
+        if (!username || !password) return;
+
+        loaderText.textContent = isRegisterMode ? "Initializing neural pathways..." : "Bypassing regional firewalls...";
+        loader.style.display = "flex";
+
+        const endpoint = isRegisterMode ? "/api/register" : "/api/login";
+        const payload = isRegisterMode 
+          ? { username, password, character_class: charClass }
+          : { username, password };
+
+        try {
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+          loader.style.display = "none";
+
+          if (!response.ok) {
+            showToast(data.error || "Connection overrun error.", "error");
+            return;
+          }
+
+          if (isRegisterMode) {
+            showToast("NEURAL PROGRESS SAVED. PLEASE LOGIN.");
+            isRegisterMode = false;
+            toggleLoginBtn.click();
+            passwordInput.value = "";
+          } else {
+            // Success Login
+            showToast("NEURAL LINK ESTABLISHED!");
+            
+            // Store session and retrieved progress values
+            localStorage.setItem("neural_username", data.username);
+            localStorage.setItem("neural_session", JSON.stringify(data));
+            
+            // Clear local cached game state to load database state instead
+            localStorage.removeItem("neural_link_state");
+            
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 1000);
+          }
+
+        } catch (err) {
+          loader.style.display = "none";
+          showToast("Network connection overrun.", "error");
+          console.error(err);
+        }
+      });
+
+      // Toast alerts helper
+      function showToast(message, type = "success") {
+        const toast = document.getElementById("toast-notification");
+        toast.textContent = message;
+        toast.style.display = "flex";
+        
+        if (type === "error") {
+          toast.style.borderColor = "var(--cyber-magenta)";
+          toast.style.boxShadow = "0 0 10px var(--cyber-magenta-glow)";
+        } else {
+          toast.style.borderColor = "var(--cyber-cyan)";
+          toast.style.boxShadow = "0 0 10px var(--cyber-cyan-glow)";
+        }
+
+        if (window.toastTimeout) clearTimeout(window.toastTimeout);
+        window.toastTimeout = setTimeout(() => {
+          toast.style.display = "none";
+        }, 2500);
+      }
+    });
+  </script>
+</body>
+</html>

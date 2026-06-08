@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neural Link | Graphic Comic Mode</title>
+  <meta name="description" content="Surveillance Comic Narrative Mode. Interface directly with the tactical visual layout.">
+  
+  <!-- Futuristic Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    :root {
+      --comic-border: #ffffff;
+      --comic-border-glow: rgba(0, 240, 255, 0.4);
+      --comic-gutter: 20px;
+    }
+
+    body {
+      background-color: #05070a;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .comic-layout {
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .comic-main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: rgba(10, 14, 20, 0.85);
+      border: 1px solid var(--border-tech);
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-family: var(--font-header);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .comic-main-header .header-logo {
+      color: var(--text-active);
+      font-size: 1rem;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .comic-main-header .header-logo i {
+      color: var(--cyber-magenta);
+      text-shadow: 0 0 10px var(--cyber-magenta-glow);
+    }
+
+    .comic-main-header .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn-home-back {
+      background: transparent;
+      border: 1px solid var(--border-tech);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      cursor: pointer;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-home-back:hover {
+      border-color: var(--cyber-cyan);
+      color: var(--cyber-cyan);
+      box-shadow: 0 0 10px var(--cyber-cyan-glow);
+    }
+
+    /* Comic Grid & Panels */
+    .comic-grid {
+      flex-grow: 1;
+      width: 100%;
+    }
+
+    @media (min-width: 1025px) {
+      .comic-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        grid-template-rows: 1fr 1fr;
+        gap: var(--comic-gutter);
+        height: calc(100vh - 100px);
+        box-sizing: border-box;
+        padding-bottom: 8px;
+      }
+      
+      .panel-1 { grid-row: 1; grid-column: 1; transform: rotate(-0.3deg); }
+      .panel-2 { grid-row: 1; grid-column: 2; transform: rotate(0.4deg); }
+      .panel-3 { grid-row: 2; grid-column: 2; transform: rotate(-0.2deg); }
+      .panel-4 { grid-row: 2; grid-column: 1; transform: rotate(0.3deg); }
+    }
+
+    @media (max-width: 1024px) {
+      .comic-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding-bottom: 40px;
+      }
+      .comic-panel {
+        height: 380px;
+      }
+    }
+
+    .comic-panel {
+      background: #000;
+      border: 4px solid var(--comic-border);
+      border-radius: 6px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .comic-panel:hover {
+      transform: scale(1.015) rotate(0deg);
+      z-index: 10;
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), 0 0 15px var(--cyber-cyan-glow);
+    }
+
+    .comic-panel.panel-2:hover {
+      border-color: var(--cyber-magenta);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), 0 0 15px var(--cyber-magenta-glow);
+    }
+
+    .comic-panel.locked {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+    
+    .comic-panel.locked:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .comic-panel-viewport {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #020305;
+    }
+
+    .comic-illustration {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+      transition: filter 0.5s ease;
+    }
+
+    .comic-illustration.glitch {
+      filter: hue-rotate(90deg) contrast(1.5) blur(3px);
+    }
+
+    /* Captions & Speech Bubbles */
+    .comic-caption {
+      position: absolute;
+      background: #ffe600;
+      color: #000000;
+      border: 2px solid #000000;
+      padding: 6px 12px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
+      z-index: 15;
+      max-width: 85%;
+    }
+
+    .comic-caption.top-left { top: 12px; left: 12px; }
+    .comic-caption.top-right { top: 12px; right: 12px; }
+    .comic-caption.bottom-left { bottom: 12px; left: 12px; }
+    .comic-caption.bottom-right { bottom: 12px; right: 12px; }
+
+    .comic-speech-bubble {
+      position: absolute;
+      background: rgba(10, 14, 20, 0.95);
+      border: 2px solid var(--border-tech);
+      border-radius: 6px;
+      padding: 10px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      max-width: 82%;
+      box-sizing: border-box;
+    }
+
+    .comic-speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      border-width: 10px 10px 0;
+      border-style: solid;
+      border-color: rgba(10, 14, 20, 0.95) transparent;
+      display: block;
+      width: 0;
+    }
+
+    .contact-bubble {
+      bottom: 16px;
+      left: 16px;
+      border-left: 4px solid var(--cyber-cyan);
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.15);
+    }
+    
+    .contact-bubble::after {
+      left: 24px;
+    }
+
+    .player-bubble {
+      bottom: 16px;
+      right: 16px;
+      border-right: 4px solid var(--cyber-magenta);
+      box-shadow: 0 4px 20px rgba(255, 0, 160, 0.15);
+    }
+
+    .player-bubble::after {
+      right: 24px;
+    }
+
+    .comic-speaker-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-tech);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyber-cyan);
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .player-bubble .comic-speaker-avatar {
+      color: var(--cyber-magenta);
+      border-color: var(--cyber-magenta);
+    }
+
+    .comic-speech-content {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .comic-speaker-name {
+      font-family: var(--font-header);
+      font-size: 0.65rem;
+      color: var(--text-active);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+
+    .comic-speech-text {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: var(--text-body);
+      font-style: italic;
+    }
+
+    /* Challenge Panel */
+    .challenge-viewport {
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 45px 16px 16px;
+      box-sizing: border-box;
+      background: radial-gradient(circle at center, rgba(10, 14, 20, 0.95) 0%, rgba(2, 3, 5, 0.98) 100%);
+    }
+
+    .challenge-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .comic-task-box {
+      background: rgba(0, 240, 255, 0.03);
+      border: 1px solid rgba(0, 240, 255, 0.1);
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .task-heading {
+      color: var(--cyber-cyan);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .task-desc {
+      color: var(--text-active);
+    }
+
+    .comic-choices-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .comic-choice-btn {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--border-tech);
+      border-left: 4px solid var(--cyber-cyan);
+      color: var(--text-active);
+      padding: 10px 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .comic-choice-btn:hover {
+      background: rgba(0, 240, 255, 0.06);
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 10px var(--cyber-cyan-glow);
+      transform: translateX(4px);
+    }
+
+    .comic-choice-btn.roll-str { border-left-color: var(--cyber-cyan); }
+    .comic-choice-btn.roll-int { border-left-color: var(--cyber-magenta); }
+    .comic-choice-btn.roll-cha { border-left-color: var(--cyber-green); }
+
+    .choice-text {
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-family: var(--font-sans);
+    }
+
+    .choice-badge {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .choice-badge.str { color: var(--cyber-cyan); }
+    .choice-badge.int { color: var(--cyber-magenta); }
+    .choice-badge.cha { color: var(--cyber-green); }
+
+    /* Resolution Panel & Dice Roller */
+    .resolution-viewport {
+      background: radial-gradient(circle at center, rgba(15, 20, 30, 0.96) 0%, rgba(2, 3, 5, 0.99) 100%);
+      padding: 45px 16px 16px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pending-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 7, 10, 0.95);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 2.5px;
+      z-index: 20;
+      transition: opacity 0.4s ease;
+    }
+
+    .pending-overlay i {
+      font-size: 2rem;
+      animation: pulse-lock 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse-lock {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* Sound Effect Overlays */
+    .comic-sfx-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-10deg) scale(0);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.8rem;
+      font-weight: 950;
+      text-align: center;
+      letter-spacing: 2px;
+      pointer-events: none;
+      z-index: 25;
+      text-transform: uppercase;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .comic-sfx-overlay.active {
+      transform: translate(-50%, -50%) rotate(-8deg) scale(1);
+      animation: sfx-glitch 1.5s infinite alternate;
+    }
+
+    .sfx-success {
+      color: #ffe600;
+      text-shadow: 4px 4px 0px #000, 0 0 20px var(--cyber-yellow-glow);
+    }
+
+    .sfx-fail {
+      color: var(--cyber-magenta);
+      text-shadow: 4px 4px 0px #000, 0 0 20px var(--cyber-magenta-glow);
+    }
+
+    @keyframes sfx-glitch {
+      0% { transform: translate(-50%, -50%) rotate(-8deg) scale(1); }
+      100% { transform: translate(-50%, -50%) rotate(-11deg) scale(1.05); }
+    }
+
+    /* Inline Dice Roller CSS */
+    .dice-roller-inline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      z-index: 18;
+    }
+
+    .dice-cube-wrapper {
+      width: 90px;
+      height: 90px;
+      margin: 10px auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .d20-graphic {
+      font-size: 4.5rem;
+      color: var(--cyber-cyan);
+      animation: rotate-d20 0.8s linear infinite;
+      display: none;
+    }
+
+    .d20-graphic.rolling {
+      display: block;
+    }
+
+    .d20-value-display {
+      font-family: var(--font-header);
+      font-size: 3rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 15px var(--cyber-cyan);
+      display: none;
+    }
+
+    .d20-value-display.shown {
+      display: block;
+    }
+
+    .dice-roll-type {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .dice-roll-formula {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--cyber-yellow);
+      margin-top: 8px;
+    }
+
+    @keyframes rotate-d20 {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Outcome Panel Container */
+    .outcome-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      z-index: 15;
+    }
+
+    .outcome-status-badge {
+      font-family: var(--font-header);
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .outcome-status-badge.success {
+      color: var(--cyber-green);
+      text-shadow: 0 0 8px var(--cyber-green-glow);
+    }
+
+    .outcome-status-badge.fail {
+      color: var(--cyber-magenta);
+      text-shadow: 0 0 8px var(--cyber-magenta-glow);
+    }
+
+    .outcome-narration {
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--text-body);
+      margin-bottom: 12px;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .outcome-speech-bubble {
+      background: rgba(10, 14, 20, 0.85);
+      border: 1px solid var(--border-tech);
+      border-radius: 4px;
+      padding: 8px 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .outcome-speech-bubble .comic-speech-content {
+      flex-grow: 1;
+    }
+
+    .btn-dice-continue {
+      background: var(--bg-deck);
+      border: 1.5px solid var(--cyber-cyan);
+      color: var(--cyber-cyan);
+      padding: 10px 20px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      letter-spacing: 1.5px;
+      text-align: center;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+
+    .btn-dice-continue:hover {
+      background: var(--cyber-cyan);
+      color: #000;
+      box-shadow: 0 0 12px var(--cyber-cyan-glow);
+    }
+
+    .btn-dice-continue.retry {
+      border-color: var(--cyber-magenta);
+      color: var(--cyber-magenta);
+    }
+
+    .btn-dice-continue.retry:hover {
+      background: var(--cyber-magenta);
+      color: #fff;
+      box-shadow: 0 0 12px var(--cyber-magenta-glow);
+    }
+  </style>
+</head>
+<body>
+  <!-- Scanlines CRT Effect -->
+  <div class="scanlines"></div>
+
+  <div class="comic-layout">
+    
+    <!-- HEADER BAR -->
+    <header class="comic-main-header">
+      <div class="header-logo">
+        <i class="fa-solid fa-book-open"></i> NEURAL_LINK // TACTICAL_COMIC_FEED
+      </div>
+      <div class="header-actions">
+        <select id="comic-chapter-select" class="form-control" style="background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-tech); color: var(--cyber-cyan); font-family: var(--font-mono); font-size: 0.72rem; padding: 4px 8px; width: 130px; margin-right: 12px; cursor: pointer; outline: none;">
+          <option value="1">CHAPTER I</option>
+          <option value="2">CHAPTER II</option>
+          <option value="3">CHAPTER III</option>
+          <option value="4">CHAPTER IV</option>
+          <option value="5">ENDING LOG</option>
+        </select>
+        <span class="system-status" id="comic-progress-badge" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyber-yellow); margin-right: 12px;">PAGE 1 / 4</span>
+        <button class="btn-home-back" onclick="window.location.href='index.html'" title="Return to System Deck">
+          <i class="fa-solid fa-arrow-left"></i> BACK_TO_DECK
+        </button>
+      </div>
+    </header>
+
+    <!-- 4-PANEL COMIC GRID -->
+    <div class="comic-grid">
+      
+      <!-- PANEL 1: ESTABLISHING SHOT -->
+      <section class="comic-panel panel-1" id="panel-scene">
+        <div class="comic-panel-viewport">
+          <img id="comic-panel-img" class="comic-illustration" src="cyberpunk_street_banner.png" alt="Tactical Scene View">
+          
+          <!-- Environmental Caption Box -->
+          <div class="comic-caption top-left" id="scene-caption">
+            ENVIRONMENTAL FEED // DISTRICT 09
+          </div>
+
+          <!-- Contact Speech Bubble overlay -->
+          <div class="comic-speech-bubble contact-bubble" id="contact-speech">
+            <div class="comic-speaker-avatar" id="contact-avatar">
+              <i class="fa-solid fa-user-astronaut"></i>
+            </div>
+            <div class="comic-speech-content">
+              <span class="comic-speaker-name" id="contact-name">KHAELEN</span>
+              <span class="comic-speech-text" id="contact-text">"Initializing neural link connection... Wait for telemetry verification."</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PANEL 2: Monologue/Portrait -->
+      <section class="comic-panel panel-2" id="panel-char">
+        <div class="comic-panel-viewport">
+          <img id="comic-char-img" class="comic-illustration" src="cyberpunk_operative_portrait.png" alt="Character Portrait">
+          
+          <!-- Caption Box -->
+          <div class="comic-caption top-right" id="char-caption">
+            OPERATIVE ANALYZER
+          </div>
+
+          <!-- Player Speech Bubble overlay -->
+          <div class="comic-speech-bubble player-bubble" id="player-speech">
+            <div class="comic-speaker-avatar">
+              <i class="fa-solid fa-user-ninja"></i>
+            </div>
+            <div class="comic-speech-content">
+              <span class="comic-speaker-name" id="player-name">ELIAS VANCE</span>
+              <span class="comic-speech-text" id="player-text">"Terminal is buzzing. Threat level registered. Checking local vectors."</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PANEL 3: CHALLENGE & Q&A OPTIONS -->
+      <section class="comic-panel panel-3" id="panel-challenge">
+        <div class="comic-panel-viewport challenge-viewport">
+          <!-- Yellow caption -->
+          <div class="comic-caption top-left" id="challenge-caption">
+            TACTICAL CHALLENGE
+          </div>
+          
+          <div class="challenge-container">
+            <div class="comic-task-box">
+              <span class="task-heading">CURRENT_TASK</span>
+              <span class="task-desc" id="comic-task-desc">Breach the local security gate firewall to register your telemetry.</span>
+            </div>
+
+            <!-- Options dynamically loaded -->
+            <div class="comic-choices-container" id="comic-choices-panel">
+              <!-- Choices dynamically generated -->
+            </div>
+          </div>
+        </section>
+
+      <!-- PANEL 4: RESOLUTION / DICE ROLL -->
+      <section class="comic-panel panel-4 locked" id="panel-resolution">
+        <div class="comic-panel-viewport resolution-viewport">
+          
+          <div class="comic-caption top-left" id="resolution-caption">
+            TACTICAL RESOLUTION
+          </div>
+
+          <!-- Comic sound effect POP OUT -->
+          <div class="comic-sfx-overlay" id="comic-sfx-text">ZAP!</div>
+
+          <!-- Locked pending state overlay -->
+          <div class="pending-overlay" id="resolution-pending-overlay">
+            <i class="fa-solid fa-lock"></i>
+            <span>AWAITING CHOICE IN PANEL 3</span>
+          </div>
+
+          <!-- Dice roller module -->
+          <div class="dice-roller-inline" id="dice-roller-inline" style="display: none;">
+            <div class="dice-roll-type" id="roll-type-label">ROLLING FOR STRENGTH</div>
+            <div class="dice-cube-wrapper">
+              <i class="fa-solid fa-dice-d20 d20-graphic rolling" id="d20-spinner-icon"></i>
+              <div class="d20-value-display" id="d20-val-text">20</div>
+            </div>
+            <div class="dice-roll-formula" id="roll-formula-text">D20 (12) + STAT (10) = 22 vs DIFFICULTY (15)</div>
+          </div>
+
+          <!-- Detailed narrative result -->
+          <div class="outcome-container" id="outcome-container" style="display: none;">
+            <div class="outcome-status-badge" id="outcome-status-badge">SUCCESS</div>
+            <p class="outcome-narration" id="outcome-narration-text">
+              You compile a localized overclock script...
+            </p>
+            
+            <div class="outcome-speech-bubble" id="outcome-speech">
+              <div class="comic-speaker-avatar" id="outcome-speech-avatar">
+                <i class="fa-solid fa-user-astronaut"></i>
+              </div>
+              <div class="comic-speech-content">
+                <span class="comic-speaker-name" id="outcome-speech-speaker">KHAELEN</span>
+                <span class="comic-speech-text" id="outcome-speech-text">"Good hack. The gate is open."</span>
+              </div>
+            </div>
+            
+            <button class="btn-dice-continue" id="dice-continue-btn">CONTINUE NARRATIVE</button>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Toast Alert System -->
+  <div id="toast-notification" class="toast-message" style="display: none;"></div>
+
+  <script>
+    let state = null;
+    let currentPage = 1;
+    let typewriterTimeout = null;
+
+    const CYBER_COORDINATES = {
+      "District 09": { x: 80, y: 150 },
+      "Kabuki Market": { x: 150, y: 80 },
+      "Arasaka Tower": { x: 220, y: 150 },
+      "Chiba slums": { x: 150, y: 200 }
+    };
+
+    // Class-specific comic branches for unique game experiences
+    const COMIC_STORY_NODES = {
+      "operative": {
+        1: {
+          title: "Chapter I: The Silicon Gate",
+          location: "District 09",
+          image: "cyberpunk_street_banner.png",
+          speaker: "KHAELEN",
+          isAI: false,
+          dialogue: "We need this data slice, Operative Vance. Find a way through the firewall before security sweeps lock down District 09.",
+          narration: "A chemical rain washes over the grid alleys of District 09. You stand before a syndicate terminal. Cybernetic lines feed directly into your wrist ports. The security terminal block is flashing orange.",
+          task: "Breach the local security gate firewall to register your telemetry.",
+          monologue: "The gate interface buffer is surging. Security sweeps are active. I need to make a move.",
+          choices: [
+            {
+              text: "Force the encryption matrix",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 14,
+              sfx: "BREACHED!",
+              successText: "You compile a localized overclock script and flood the gate buffers. The firewall collapses in a heap of green codes.",
+              failText: "The firewall pushes a massive feedback spike back down your line. Your neural implants sizzle (-8 HP intelligence shock).",
+              nextPage: 2
+            },
+            {
+              text: "Brute-force the terminal couplings",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 12,
+              sfx: "WRENCHED!",
+              successText: "You grab the metal coupling casing and wrench it loose. Sparks fly as the terminal resets, releasing the physical line lock.",
+              failText: "The metal case cuts your synth-leather gloves and alarms trigger. You receive a mild shock (-5 Strength).",
+              nextPage: 2
+            },
+            {
+              text: "Query the terminal's routing controller",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 11,
+              sfx: "OVERRIDE!",
+              successText: "You voice-spoof a corporate admin protocol. The terminal routing system clicks, accepting the command and bypassing safety gates.",
+              failText: "The routing AI rejects your voiceprint and flags your terminal ID as hostile. Threat scanners align.",
+              nextPage: 2
+            }
+          ]
+        },
+        2: {
+          title: "Chapter II: Koi and Holograms",
+          location: "Kabuki Market",
+          image: "cyberpunk_kabuki_market.png",
+          speaker: "CYBORG_DEALER",
+          isAI: false,
+          dialogue: "Mainframe access protocols aren't cheap, friend. Hand over your Cred-Key credentials, or hack it yourself and face Arasaka enforcers.",
+          narration: "You slip into the crowded alleyways of Kabuki Market. Cyber-koi swim in mid-air above glowing noodle stalls. The infodealer, a cyborg with optical camera lenses, watches you.",
+          task: "Acquire the Mainframe Passkey from the Kabuki infodealer.",
+          monologue: "His optical implants are scanning me. If I hack him, I risk a countertrace. But credentials cost credits.",
+          choices: [
+            {
+              text: "Bribe the infodealer with credits",
+              badge: "Requires Cred-Key",
+              type: "inventory_check",
+              requiredItem: "cred_key",
+              sfx: "TRADED!",
+              successText: "You slide your Syndicate Cred-Key into his deck. The optical lens clicks. He transfers the Mainframe Protocol script.",
+              failText: "You don't have a Cred-Key in your inventory hold! The cyborg dealer refuses to talk.",
+              nextPage: 3
+            },
+            {
+              text: "Hack his personal neural cyberdeck",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 15,
+              sfx: "SIPHONED!",
+              successText: "You tap his terminal deck wireless feed, slipping past his security sub-routines and copying the protocol directly.",
+              failText: "His cyberdeck triggers an automatic counter-trace, zapping your neural cortex (+5 intelligence stress, fail!).",
+              nextPage: 3
+            },
+            {
+              text: "Negotiate a trade deal",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 13,
+              sfx: "SCHEMED!",
+              successText: "Your corporate jargon convinces him you are an Arasaka broker. He hands over the passcode hoping for a payout.",
+              failText: "He sneers. 'Do I look like a corporate rookie to you, Operative? Creds or go away.'",
+              nextPage: 3
+            }
+          ]
+        },
+        3: {
+          title: "Chapter III: The Rust Alleyways",
+          location: "Chiba slums",
+          image: "cyberpunk_chiba_slums.png",
+          speaker: "BORDER_GUARD",
+          isAI: false,
+          dialogue: "Arasaka Express elevator is locked. Faction tax is 1,000 credits, or you can clear these enforcer drones blocking our block.",
+          narration: "The freight elevator drops you into the dark smog of Chiba slums. Hanging wires spit sparks into oily puddles. A border guard faction leader blocks the lift station.",
+          task: "Siphon coordinates or clear the enforcer guards to reach the lift.",
+          monologue: "Drones are searching the sector. If I pick a fight, I need strength. If I hotwire the node, intelligence. If I talk, charisma.",
+          choices: [
+            {
+              text: "Attack the patrolling security enforcer",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 15,
+              sfx: "SMASHED!",
+              successText: "You draw your weapon and blast the drone's power cell. The drone crash-lands in a shower of sparks, clearing the grid.",
+              failText: "Your strike misses! The drone sweeps back, grazing your arm with laser fire (-10 HP strength penalty).",
+              nextPage: 4
+            },
+            {
+              text: "Hotwire the sub-station elevator line",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 14,
+              sfx: "WIRED!",
+              successText: "You bypass the elevator lock by linking your cyberdeck directly. The platform activates and starts climbing.",
+              failText: "You crossed the wrong terminals. The elevator sparks and goes dead. You must try another route.",
+              nextPage: 4
+            },
+            {
+              text: "Intimidate the border guard faction",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 13,
+              sfx: "BLUFFED!",
+              successText: "You flashing your syndicate credentials. The guard leader sighs, nods, and steps aside to unlock the lift.",
+              failText: "The guard laughs. 'Your syndicate badges are trash in Chiba slums, Operative. Clear the drones or get lost.'",
+              nextPage: 4
+            }
+          ]
+        },
+        4: {
+          title: "Chapter IV: The Cybernetic Core",
+          location: "Arasaka Tower",
+          image: "cyberpunk_arasaka_tower.png",
+          speaker: "AI_CORE_OMEGA",
+          isAI: true,
+          dialogue: "Security overrun sequence active. System purging in 30 seconds. All data assets will be deleted.",
+          narration: "You stand inside the high-security server vault of Arasaka Tower. The central mainframe core glows with blue cybernetic lights behind a protective laser shield.",
+          task: "Download the Chrome Ghost memory data core and escape.",
+          monologue: "This is it. The database holding my identity is right there. I have to breach the core right now.",
+          choices: [
+            {
+              text: "Overload the shielding couplings",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 16,
+              sfx: "OVERLOAD!",
+              successText: "You smash the physical coolant pipes. Nitrogen ice bursts out, cracking the lasers and unlocking the core. You extract the drive!",
+              failText: "The shield coupling explodes. You are thrown back by the impact, gasping for air. Time is running out!",
+              nextPage: 5
+            },
+            {
+              text: "Inject override decryption script",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 15,
+              sfx: "INJECTED!",
+              successText: "You plug the protocol drive in. The security AI flashes green as the bypass succeeds. The memory drive unlocks!",
+              failText: "Decryption firewall blocks the injection. The server zaps your cortex, scrambling your screen HUD.",
+              nextPage: 5
+            },
+            {
+              text: "Override the AI Core Omega logic loops",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 14,
+              sfx: "EXPLOITED!",
+              successText: "You feedback the core's own security guidelines. Confused by the logic loop, the AI shuts down the lasers.",
+              failText: "The core detects the logic spoof. 'Bypass attempt rejected. Purge sequence accelerated.'",
+              nextPage: 5
+            }
+          ]
+        }
+      },
+      "netrunner": {
+        1: {
+          title: "Chapter I: Subgrid Infiltration",
+          location: "District 09",
+          image: "cyberpunk_street_banner.png",
+          speaker: "KHAELEN",
+          isAI: false,
+          dialogue: "Kira, Netwatch scouts are tracing our subgrid entry. Siphon the telemetry buffer and hide your routing nodes.",
+          narration: "The damp air of District 09 hums with electrical tension. You plug your customized cyberdeck directly into the subgrid node. Codes flicker rapidly across your optical visor.",
+          task: "Trace the tracer route and breach the gateway firewall.",
+          monologue: "Telemetry lines are surging. A clean hack will require Intelligence, while physical overrides require Strength.",
+          choices: [
+            {
+              text: "Deploy customized bypass matrix",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 12,
+              sfx: "BREACHED!",
+              successText: "You flood the gateways with dummy tracer packets, overloading Netwatch detectors and bypassing security.",
+              failText: "A feedback spike hits your deck, frying your visor display and causing painful cortex shock (-8 Intelligence).",
+              nextPage: 2
+            },
+            {
+              text: "Wrench utility grid wiring",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 14,
+              sfx: "SHORTSYNC!",
+              successText: "You wrench the power conduits apart, forcing a physical shutoff of the subgrid tracing scanner.",
+              failText: "Sparks jump directly to your hand implants, causing a massive physical burn shock (-6 Strength).",
+              nextPage: 2
+            },
+            {
+              text: "Spoof Netwatch routing protocols",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 11,
+              sfx: "SPOOFED!",
+              successText: "You voice-spoof a corporate relay technician. Netwatch routes the tracer away, accepting the fake telemetry.",
+              failText: "The relay rejects your voiceprint and locks down your deck ports. Security sweeps accelerate.",
+              nextPage: 2
+            }
+          ]
+        },
+        2: {
+          title: "Chapter II: Hologram Decoy",
+          location: "Kabuki Market",
+          image: "cyberpunk_kabuki_market.png",
+          speaker: "CYBORG_DEALER",
+          isAI: false,
+          dialogue: "Attention Kira Thorn: Netwatch enforcer drones have flagged your deck signatures. They are scanning noodle stalls.",
+          narration: "In Kabuki Market, massive neon fish swim above glowing stalls. Corporate enforcer drones hover overhead. An infodealer whispers that the market relay controls the hologram koi.",
+          task: "Create a holographic distraction to escape Netwatch sweeps.",
+          monologue: "If I hack the hologram projector, I can create a decoy. If I bribe the dealer, I get the path. If I negotiate, I get his bypass key.",
+          choices: [
+            {
+              text: "Bribe the infodealer with credits",
+              badge: "Requires Cred-Key",
+              type: "inventory_check",
+              requiredItem: "cred_key",
+              sfx: "TRADED!",
+              successText: "He plugs a override injector pass into your deck. The hologram fish double in size, blinding the drones.",
+              failText: "No credits in cargo! The dealer sneers and turns away.",
+              nextPage: 3
+            },
+            {
+              text: "Overload the Koi holograms",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 13,
+              sfx: "GLITCHED!",
+              successText: "You inject a loop script. The cyber-koi turn into blinding flares, blocking drone optics and Netwatch scanners.",
+              failText: "The projector safety limits block your injection, zapping your deck and scrambling your optics (-6 Intelligence).",
+              nextPage: 3
+            },
+            {
+              text: "Fabricate corporate credentials",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 14,
+              sfx: "EXPLOITED!",
+              successText: "You fake a broker signature. The Netwatch drones move on, accepting your forged authorization files.",
+              failText: "They flag your signature as fraudulent. Drones align scanner beams and begin firing.",
+              nextPage: 3
+            }
+          ]
+        },
+        3: {
+          title: "Chapter III: Shanty Relay Hack",
+          location: "Chiba slums",
+          image: "cyberpunk_chiba_slums.png",
+          speaker: "BORDER_GUARD",
+          isAI: false,
+          dialogue: "Sub-level elevator access restricted. Faction credentials or core override scripts required, Netrunner.",
+          narration: "You descend into Chiba slums, where rust-coated shacks dangle sparks into chemical sludge. An elevator leads up to Arasaka, but it is locked by local faction protocols.",
+          task: "Bypass the shanty elevator relay to reach the server vault.",
+          monologue: "The relay is old hardware. I can hotwire the elevator panel, disable the enforcer drone guards, or intimidate the faction gatekeeper.",
+          choices: [
+            {
+              text: "Attack patrolling security drone",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 15,
+              sfx: "SMASHED!",
+              successText: "You draw your weapon and overload the drone battery, making it crash into the elevator gate and blowing it open.",
+              failText: "Drone fires back, damaging your subdermal plating and causing severe arm damage (-10 Strength).",
+              nextPage: 4
+            },
+            {
+              text: "Hotwire shanty elevator relay",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 12,
+              sfx: "WIRED!",
+              successText: "You link your deck and splice the relay circuits. The elevator hums to life, ascending rapidly.",
+              failText: "Terminals spark, shutting down the shanty grid and locking the platform safety brakes.",
+              nextPage: 4
+            },
+            {
+              text: "Negotiate with faction gatekeeper",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 13,
+              sfx: "BLUFFED!",
+              successText: "You promise them sub-network data nodes. The gatekeeper clicks the lock open, waving you through.",
+              failText: "They laugh. 'Information doesn't feed us, netrunner. Clear the drones or get out.'",
+              nextPage: 4
+            }
+          ]
+        },
+        4: {
+          title: "Chapter IV: Mainframe Siphon",
+          location: "Arasaka Tower",
+          image: "cyberpunk_arasaka_tower.png",
+          speaker: "AI_CORE_OMEGA",
+          isAI: true,
+          dialogue: "Hostile data siphon active. Commencing deep purge of all Netrunner memory sectors.",
+          narration: "You stand inside Arasaka's server core. A massive glowing AI cylinder stands behind laser fields. The memory of your childhood identity is locked inside.",
+          task: "Siphon your memory bank database files and escape.",
+          monologue: "This is the final node. I can decrypt the AI loops, overload the cooling cells, or spoof the core safety guidelines.",
+          choices: [
+            {
+              text: "Inject override decryption script",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 14,
+              sfx: "SIPHONED!",
+              successText: "You inject your custom malware. The laser field shuts down and data flows into your deck!",
+              failText: "The AI blocks the injection, sending shock feedback down your deck. Implants scramble (-6 Intelligence).",
+              nextPage: 5
+            },
+            {
+              text: "Smash nitrogen coolant valves",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 16,
+              sfx: "SHATTERED!",
+              successText: "You break the nitrogen pipes. Frost shatters the lasers, unlocking the database.",
+              failText: "The explosion throws you back, causing internal injuries and minor implant meltdown.",
+              nextPage: 5
+            },
+            {
+              text: "Overload AI logic loops",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 15,
+              sfx: "EXPLOITED!",
+              successText: "You query the AI with conflicting directives, locking it in a logic loop and dropping the shields.",
+              failText: "The AI detects the exploit and speeds up the database deletion, erasing sectors.",
+              nextPage: 5
+            }
+          ]
+        }
+      },
+      "samurai": {
+        1: {
+          title: "Chapter I: Alleyway Ambush",
+          location: "District 09",
+          image: "cyberpunk_street_banner.png",
+          speaker: "KHAELEN",
+          isAI: false,
+          dialogue: "Jaxen, corporate enforcers are closing in. Draw your blade and clear the path before they box us in!",
+          narration: "Ozone smells fill the grid alleyways of District 09. Two heavily armored Arasaka enforcers step from the steam, weapons drawn. Your monofilament blade hums with active charge.",
+          task: "Defeat the enforcer guards or bypass the checkpoint.",
+          monologue: "They have tactical armor. I can slice their power cells, hack their comms, or bluff my credentials.",
+          choices: [
+            {
+              text: "Slice enforcer suit power cells",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 12,
+              sfx: "SLICED!",
+              successText: "You leap forward, slicing their suit power cells. Their armor goes dead and they collapse into the rain.",
+              failText: "Your strike misses! An enforcer strikes you with an electric stun baton (-10 Strength).",
+              nextPage: 2
+            },
+            {
+              text: "Hack enforcer squad comms",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 15,
+              sfx: "DEAFENED!",
+              successText: "You tap their squad frequencies and emit a deafening feedback squeal, blinding their HUDs.",
+              failText: "Their encryption block feedback fries your headset, scrambling your neural links (-6 Intelligence).",
+              nextPage: 2
+            },
+            {
+              text: "Intimidate the patrol scouts",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 13,
+              sfx: "BACKEDDOWN!",
+              successText: "You flash your syndicate tattoos and activate red optics. Recognizing your reputation, they step back.",
+              failText: "They laugh. 'You are just a rogue street thug, samurai.' They raise weapons and fire.",
+              nextPage: 2
+            }
+          ]
+        },
+        2: {
+          title: "Chapter II: Kabuki Showdown",
+          location: "Kabuki Market",
+          image: "cyberpunk_kabuki_market.png",
+          speaker: "CYBORG_DEALER",
+          isAI: false,
+          dialogue: "I don't deal with street muscle, samurai. Hand over creds or your monofilament blade, or get out.",
+          narration: "Holograms glow above the wet streets of Kabuki Market. You corner the infodealer, a cyborg with optical lens upgrades. He is backed by three market thugs holding stun clubs.",
+          task: "Convince or force the infodealer to give up the passcode.",
+          monologue: "Thugs are surrounding me. I can fight them, bribe the dealer, or threaten to slice his optical lenses.",
+          choices: [
+            {
+              text: "Bribe dealer with credits",
+              badge: "Requires Cred-Key",
+              type: "inventory_check",
+              requiredItem: "cred_key",
+              sfx: "PAID!",
+              successText: "You toss him the cred-key. He nods and transfers the access codes, dismissing his thugs.",
+              failText: "You have no cred-key in your cargo! The thugs raise clubs and charge.",
+              nextPage: 3
+            },
+            {
+              text: "Threaten dealer with blade",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 12,
+              sfx: "TERRIFIED!",
+              successText: "You press your molecular blade to his synthetic throat. He hands over the codes instantly, trembling.",
+              failText: "The thugs step in. 'Nice try, samurai.' A melee erupts, bruising your implants (-6 Charisma).",
+              nextPage: 3
+            },
+            {
+              text: "Hack market safety panel",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 15,
+              sfx: "BLACKOUT!",
+              successText: "You tap the terminal block, overloading the market lights and escaping in the blackout.",
+              failText: "You cross the safety wires. Alarm sirens sound, warning Netwatch enforcers.",
+              nextPage: 3
+            }
+          ]
+        },
+        3: {
+          title: "Chapter III: Checkpoint Sweep",
+          location: "Chiba slums",
+          image: "cyberpunk_chiba_slums.png",
+          speaker: "BORDER_GUARD",
+          isAI: false,
+          dialogue: "This sector elevator is locked by faction rules. We don't take orders from corporate street trash.",
+          narration: "You stand in Chiba slums. Toxic smog swirls around hanging wires. Faction border guards block the mag-lev elevator. Overhead, enforcer drones scan the shanties.",
+          task: "Clear the faction checkpoint to access the tower elevator.",
+          monologue: "Drones are sweeping the lanes. I can smash their chassis, bypass the lock panel, or intimidate the faction leader.",
+          choices: [
+            {
+              text: "Attack patrolling drone chassis",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 13,
+              sfx: "CLEAVED!",
+              successText: "You draw your blade and slice the drone in half. It crashes in sparks, clearing the lift gate.",
+              failText: "The drone shoots laser bolts, burning your arms and armor plating (-8 Strength).",
+              nextPage: 4
+            },
+            {
+              text: "Hotwire checkpoint lift panel",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 14,
+              sfx: "JUMPED!",
+              successText: "You bypass the elevator gate protocols, starting the lift capsule climb.",
+              failText: "Sparks reset the lift safety logs. Access denied, triggering firewall blocks.",
+              nextPage: 4
+            },
+            {
+              text: "Intimidate checkpoint leader",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 13,
+              sfx: "INTIMIDATED!",
+              successText: "Your battle scars and weapon warning lights convince him to unlock the lift quickly.",
+              failText: "He signals his men. 'Clear him out, boys!' You are forced to fallback.",
+              nextPage: 4
+            }
+          ]
+        },
+        4: {
+          title: "Chapter IV: Core Vault Overload",
+          location: "Arasaka Tower",
+          image: "cyberpunk_arasaka_tower.png",
+          speaker: "AI_CORE_OMEGA",
+          isAI: true,
+          dialogue: "Intruder warning. Security grid active. Purging core assets in 30 seconds.",
+          narration: "You stand in the server core of Arasaka Tower. Behind laser fields stands the data core holding your military records. The terminal alarm is blaring.",
+          task: "Break the core shields and recover your military memories.",
+          monologue: "This is the final barrier. I can smash the coolant pipes, hack the terminal controls, or force the AI logic override.",
+          choices: [
+            {
+              text: "Smash nitrogen coolant couplings",
+              badge: "Str check",
+              type: "strength",
+              difficulty: 14,
+              sfx: "SMASHED!",
+              successText: "You strike the coolant pipes with full force. Nitrogen ice cracks the lasers, unlocking the database!",
+              failText: "The couplings burst. Nitrogen ice gas sprays your chest, causing severe frostbite (-10 Strength).",
+              nextPage: 5
+            },
+            {
+              text: "Hack security mainframe controls",
+              badge: "Int check",
+              type: "intelligence",
+              difficulty: 16,
+              sfx: "WIRED!",
+              successText: "You tap the control lines, shutting down the laser shield bypass protocols.",
+              failText: "The security sweep detects the connection, zapping your deck and scrambling cortex nodes.",
+              nextPage: 5
+            },
+            {
+              text: "Trigger AI safety loops override",
+              badge: "Cha check",
+              type: "charisma",
+              difficulty: 15,
+              sfx: "CONFUSED!",
+              successText: "You feed the AI security guidelines, forcing a safety loop shutdown of lasers.",
+              failText: "The AI ignores the command. 'Bypass rejected. Purge sequence accelerated.'",
+              nextPage: 5
+            }
+          ]
+        }
+      }
+    };
+
+    function loadSessionAndProgress() {
+      const username = localStorage.getItem("neural_username");
+      const session = localStorage.getItem("neural_session");
+
+      if (!username || !session) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const cachedState = localStorage.getItem("neural_link_state");
+      if (cachedState) {
+        state = JSON.parse(cachedState);
+      } else {
+        state = JSON.parse(session);
+      }
+
+      // Default to Page 1 to allow playing the whole story from start
+      currentPage = 1;
+
+      // Bind dropdown change event listener
+      const selectEl = document.getElementById("comic-chapter-select");
+      if (selectEl) {
+        selectEl.value = currentPage;
+        selectEl.addEventListener("change", (e) => {
+          currentPage = parseInt(e.target.value);
+          renderStoryPage();
+        });
+      }
+
+      renderStoryPage();
+    }
+
+    function renderStoryPage() {
+      // Sync dropdown selector value
+      const selectEl = document.getElementById("comic-chapter-select");
+      if (selectEl) {
+        selectEl.value = currentPage;
+      }
+
+      if (currentPage === 5) {
+        renderEndingPage();
+        return;
+      }
+
+      const playerClass = (state.player && state.player.class) ? state.player.class.toLowerCase() : "operative";
+      const classStory = COMIC_STORY_NODES[playerClass] || COMIC_STORY_NODES["operative"];
+      const node = classStory[currentPage];
+      
+      // Update header info
+      document.getElementById("comic-progress-badge").textContent = `PAGE ${currentPage} / 4`;
+      
+      // Panel 1: Environment details
+      document.getElementById("scene-caption").textContent = `ENVIRONMENTAL FEED // ${node.location.toUpperCase()}`;
+      
+      const sceneImg = document.getElementById("comic-panel-img");
+      sceneImg.classList.add("glitch");
+      setTimeout(() => {
+        sceneImg.src = node.image;
+        sceneImg.classList.remove("glitch");
+      }, 150);
+
+      // Panel 1 Dialogue Speech bubble
+      const contactBubble = document.getElementById("contact-speech");
+      const contactAvatar = document.getElementById("contact-avatar");
+      const contactName = document.getElementById("contact-name");
+      const contactText = document.getElementById("contact-text");
+
+      contactBubble.className = node.isAI ? "comic-speech-bubble contact-bubble ai-speaker" : "comic-speech-bubble contact-bubble";
+      contactAvatar.innerHTML = `<i class="fa-solid ${node.isAI ? 'fa-microchip' : 'fa-user-ninja'}"></i>`;
+      contactName.textContent = node.speaker;
+      
+      // Typewriter effect on Panel 1 dialogue
+      if (typewriterTimeout) clearTimeout(typewriterTimeout);
+      let idx = 0;
+      contactText.textContent = '""';
+      function typeSpeaker() {
+        if (idx < node.dialogue.length) {
+          contactText.textContent = `"${node.dialogue.slice(0, idx + 1)}"`;
+          idx++;
+          typewriterTimeout = setTimeout(typeSpeaker, 15);
+        }
+      }
+      typeSpeaker();
+
+      // Panel 2: Character Portrait & monologue
+      const charImg = document.getElementById("comic-char-img");
+      const charCaption = document.getElementById("char-caption");
+      const playerNameTag = document.getElementById("player-name");
+      const playerTextTag = document.getElementById("player-text");
+
+      charCaption.textContent = `${playerClass.toUpperCase()} LOG ENTRY`;
+      playerNameTag.textContent = (state.player && state.player.name) ? state.player.name.toUpperCase() : "OPERATIVE";
+      playerTextTag.textContent = `"${node.monologue}"`;
+
+      // Select dynamic portrait
+      if (playerClass === "netrunner") {
+        charImg.src = "cyberpunk_netrunner_portrait.png";
+      } else if (playerClass === "samurai") {
+        charImg.src = "cyberpunk_samurai_portrait.png";
+      } else {
+        charImg.src = "cyberpunk_operative_portrait.png";
+      }
+
+      // Panel 3: Challenge options Q&A
+      document.getElementById("challenge-caption").textContent = `TACTICAL TASK // PAGE ${currentPage}`;
+      document.getElementById("comic-task-desc").textContent = node.task;
+
+      const choicePanel = document.getElementById("comic-choices-panel");
+      choicePanel.innerHTML = "";
+
+      node.choices.forEach(ch => {
+        const btn = document.createElement("button");
+        btn.className = `comic-choice-btn roll-${ch.type === "intelligence" ? "int" : ch.type === "strength" ? "str" : ch.type === "charisma" ? "cha" : "int"}`;
+        
+        btn.innerHTML = `
+          <span class="choice-text">${ch.text}</span>
+          <span class="choice-badge ${ch.type === "intelligence" ? "int" : ch.type === "strength" ? "str" : ch.type === "charisma" ? "cha" : "int"}">[${ch.badge}]</span>
+        `;
+        
+        btn.addEventListener("click", () => handleChoiceClick(ch));
+        choicePanel.appendChild(btn);
+      });
+
+      // Reset Panel 4 back to locked/pending state
+      const panel4 = document.getElementById("panel-resolution");
+      panel4.classList.add("locked");
+      
+      document.getElementById("resolution-pending-overlay").style.opacity = "1";
+      document.getElementById("resolution-pending-overlay").style.display = "flex";
+      document.getElementById("dice-roller-inline").style.display = "none";
+      document.getElementById("outcome-container").style.display = "none";
+      
+      const sfx = document.getElementById("comic-sfx-text");
+      sfx.className = "comic-sfx-overlay";
+    }
+
+    async function handleChoiceClick(choice) {
+      const playerClass = (state.player && state.player.class) ? state.player.class.toLowerCase() : "operative";
+      const classStory = COMIC_STORY_NODES[playerClass] || COMIC_STORY_NODES["operative"];
+      const node = classStory[currentPage];
+      const panel4 = document.getElementById("panel-resolution");
+      
+      // Disable choice buttons during animation/resolution
+      const btns = document.querySelectorAll(".comic-choice-btn");
+      btns.forEach(b => b.disabled = true);
+      
+      // Unlock Panel 4 visually
+      panel4.classList.remove("locked");
+      document.getElementById("resolution-pending-overlay").style.opacity = "0";
+      setTimeout(() => {
+        document.getElementById("resolution-pending-overlay").style.display = "none";
+      }, 400);
+
+      // If Inventory Check choice
+      if (choice.type === "inventory_check") {
+        const hasItem = state.inventory.some(i => i.id === choice.requiredItem);
+        if (hasItem) {
+          showToast(`SUCCESS: Syndicate Cred-Key exchanged.`);
+          
+          // Process item swap
+          const keyIdx = state.inventory.findIndex(i => i.id === "cred_key");
+          state.inventory.splice(keyIdx, 1);
+          state.inventory.push({
+            id: "mainframe_pass",
+            name: "Mainframe Protocol",
+            type: "quest",
+            quantity: 1,
+            description: "Decryption scripts to bypass the security wall at Arasaka Tower."
+          });
+          
+          state.currentLocation = "Chiba slums";
+          state.threatLevel = "HIGH";
+          if (!state.exploredLocations["Chiba slums"]) {
+            state.exploredLocations["Chiba slums"] = {
+              name: "Chiba slums",
+              description: "The dark underbelly of Neo-Tokyo covered in smog.",
+              coordinates: CYBER_COORDINATES["Chiba slums"]
+            };
+          }
+          state.mapConnections.push(["Kabuki Market", "Chiba slums"]);
+          
+          state.storyLog.push({ role: "story", text: choice.successText });
+          state.terminalLogs.push({ type: "roll-result", text: `[TRADE: SUCCESS] Exchanged Cred-Key for Mainframe Pass.` });
+          
+          displayOutcome(true, choice, choice.successText);
+        } else {
+          showToast(`FAILED: Missing Cred-Key!`);
+          state.storyLog.push({ role: "story", text: choice.failText });
+          displayOutcome(false, choice, choice.failText);
+        }
+        return;
+      }
+
+      // Inline D20 Hacking Challenge Roller
+      const roller = document.getElementById("dice-roller-inline");
+      const spinner = document.getElementById("d20-spinner-icon");
+      const valDisplay = document.getElementById("d20-val-text");
+      const label = document.getElementById("roll-type-label");
+      const formula = document.getElementById("roll-formula-text");
+
+      // Reset roller elements
+      roller.style.display = "flex";
+      label.textContent = `ROLLING FOR ${choice.type.toUpperCase()}`;
+      spinner.classList.add("rolling");
+      valDisplay.classList.remove("shown");
+      formula.textContent = "Synthesizing visual dice vector...";
+
+      // Roll spinner animation loop
+      let spinCount = 0;
+      const spinInterval = setInterval(() => {
+        valDisplay.textContent = Math.floor(Math.random() * 20) + 1;
+        spinCount++;
+        if (spinCount > 10) {
+          clearInterval(spinInterval);
+          
+          // Get character stat modifier
+          const statVal = (state.player && state.player.stats) ? (state.player.stats[choice.type] || 50) : 50;
+          const statMod = Math.floor(statVal / 10);
+          
+          const rollValue = Math.floor(Math.random() * 20) + 1;
+          const totalValue = rollValue + statMod;
+          const isSuccess = totalValue >= choice.difficulty;
+
+          spinner.classList.remove("rolling");
+          valDisplay.textContent = rollValue;
+          valDisplay.classList.add("shown");
+
+          formula.textContent = `Roll (${rollValue}) + Stat Mod (+${statMod}) = ${totalValue} vs Diff (${choice.difficulty})`;
+
+          setTimeout(() => {
+            roller.style.display = "none";
+            
+            if (isSuccess) {
+              // Apply attributes rewards
+              if (state.player && state.player.stats) {
+                state.player.stats[choice.type] = Math.min(100, state.player.stats[choice.type] + 3);
+              }
+              
+              // Progress locations
+              let newLocation = "Kabuki Market";
+              let prevLocation = "District 09";
+              if (currentPage === 2) {
+                newLocation = "Chiba slums";
+                prevLocation = "Kabuki Market";
+              } else if (currentPage === 3) {
+                newLocation = "Arasaka Tower";
+                prevLocation = "Chiba slums";
+              } else if (currentPage === 4) {
+                newLocation = "Arasaka Tower";
+                prevLocation = "Arasaka Tower";
+              }
+
+              state.currentLocation = newLocation;
+              state.threatLevel = newLocation === "Kabuki Market" ? "LOW" : "HIGH";
+
+              if (!state.exploredLocations[newLocation]) {
+                state.exploredLocations[newLocation] = {
+                  name: newLocation,
+                  description: "Breached during Comic Simulation.",
+                  coordinates: CYBER_COORDINATES[newLocation] || { x: 150, y: 125 }
+                };
+              }
+
+              if (newLocation !== prevLocation) {
+                const linked = state.mapConnections.some(pair =>
+                  (pair[0] === prevLocation && pair[1] === newLocation) ||
+                  (pair[0] === newLocation && pair[1] === prevLocation)
+                );
+                if (!linked) {
+                  state.mapConnections.push([prevLocation, newLocation]);
+                }
+              }
+
+              state.storyLog.push({ role: "story", text: choice.successText });
+              state.terminalLogs.push({ type: "roll-result", text: `[ROLL SUCCESS] ${choice.type.toUpperCase()} check. Passed ${totalValue} vs ${choice.difficulty}.` });
+
+              // Custom weapon reward in chapter III
+              if (currentPage === 3) {
+                state.inventory.push({
+                  id: "laser_carbine",
+                  name: "Laser Carbine",
+                  type: "weapon",
+                  quantity: 1,
+                  description: "High-yield laser weapon for melting corporate enforcer plates."
+                });
+              }
+
+              displayOutcome(true, choice, choice.successText);
+            } else {
+              // Apply stats penalty on failure
+              if (state.player && state.player.stats) {
+                if (choice.type === "strength") {
+                  state.player.stats.strength = Math.max(0, state.player.stats.strength - 6);
+                } else if (choice.type === "intelligence") {
+                  state.player.stats.intelligence = Math.max(0, state.player.stats.intelligence - 6);
+                } else {
+                  state.player.stats.charisma = Math.max(0, state.player.stats.charisma - 6);
+                }
+              }
+
+              state.storyLog.push({ role: "story", text: choice.failText });
+              state.terminalLogs.push({ type: "roll-result", text: `[ROLL FAILED] ${choice.type.toUpperCase()} check. Failed ${totalValue} vs ${choice.difficulty}.` });
+
+              displayOutcome(false, choice, choice.failText);
+            }
+          }, 1000);
+        }
+      }, 65);
+    }
+
+    function displayOutcome(isSuccess, choice, text) {
+      // 1. Show Comic Sound Effect text
+      const sfx = document.getElementById("comic-sfx-text");
+      sfx.textContent = isSuccess ? (choice.sfx || "BOOM!") : "ZAP!";
+      sfx.className = `comic-sfx-overlay active ${isSuccess ? 'sfx-success' : 'sfx-fail'}`;
+
+      // 2. Load outcome layout details
+      const container = document.getElementById("outcome-container");
+      const badge = document.getElementById("outcome-status-badge");
+      const narration = document.getElementById("outcome-narration-text");
+      const feedbackName = document.getElementById("outcome-speech-speaker");
+      const feedbackText = document.getElementById("outcome-speech-text");
+      const continueBtn = document.getElementById("dice-continue-btn");
+
+      container.style.display = "flex";
+      badge.textContent = isSuccess ? "CHECK SUCCESSFUL" : "CHECK FAILED";
+      badge.className = isSuccess ? "outcome-status-badge success" : "outcome-status-badge fail";
+      
+      narration.textContent = text;
+      
+      feedbackName.textContent = isSuccess ? "KHAELEN" : "SYSTEM DECK ERROR";
+      feedbackText.textContent = isSuccess ? `"Excellent coordination. Telemetry channels are clear."` : `"Caution: system shock feedback registered. Re-route protocols."`;
+
+      if (isSuccess) {
+        continueBtn.textContent = "CONTINUE NARRATIVE";
+        continueBtn.className = "btn-dice-continue";
+        continueBtn.onclick = async () => {
+          currentPage = choice.nextPage;
+          localStorage.setItem("neural_link_state", JSON.stringify(state));
+          await syncToDatabase();
+          renderStoryPage();
+        };
+      } else {
+        continueBtn.textContent = "RETRY CHALLENGE";
+        continueBtn.className = "btn-dice-continue retry";
+        continueBtn.onclick = async () => {
+          localStorage.setItem("neural_link_state", JSON.stringify(state));
+          await syncToDatabase();
+          renderStoryPage();
+        };
+      }
+    }
+
+    function renderEndingPage() {
+      document.getElementById("comic-progress-badge").textContent = "MISSION COMPLETED";
+      document.getElementById("scene-caption").textContent = "ENDING // MEMORY BANK RESTORED";
+      document.getElementById("char-caption").textContent = "OPERATIVE VERIFIED";
+      
+      // Update environments
+      const sceneImg = document.getElementById("comic-panel-img");
+      sceneImg.src = "cyberpunk_street_banner.png";
+
+      const contactBubble = document.getElementById("contact-speech");
+      const contactAvatar = document.getElementById("contact-avatar");
+      const contactName = document.getElementById("contact-name");
+      const contactText = document.getElementById("contact-text");
+
+      contactBubble.className = "comic-speech-bubble contact-bubble";
+      contactAvatar.innerHTML = `<i class="fa-solid fa-user-ninja"></i>`;
+      
+      const charImg = document.getElementById("comic-char-img");
+      const playerTextTag = document.getElementById("player-text");
+
+      // Character-specific custom ending texts
+      const endingClass = (state.player && state.player.class) ? state.player.class.toLowerCase() : "operative";
+      if (endingClass === "netrunner") {
+        charImg.src = "cyberpunk_netrunner_portrait.png";
+        contactName.textContent = "KIRA THORN";
+        contactText.textContent = `"System core verified. My memory nodes are active. I finally remember coding AI Core Omega."`;
+        playerTextTag.textContent = `"The database records are merged. I designed the core years ago."`;
+      } else if (endingClass === "samurai") {
+        charImg.src = "cyberpunk_samurai_portrait.png";
+        contactName.textContent = "JAXEN STERLING";
+        contactText.textContent = `"Tactical logs restored. I remember the military discharge files. Vance saved me."`;
+        playerTextTag.textContent = `"My monofilament blade is charged, and my military record is clear. Vance is my ally."`;
+      } else {
+        charImg.src = "cyberpunk_operative_portrait.png";
+        contactName.textContent = "ELIAS VANCE";
+        contactText.textContent = `"System core verified. My database records are back online. We survived the Obsidian Rain."`;
+        playerTextTag.textContent = `"The Chrome Ghost memories are integrated. Vance's forgotten history is clear."`;
+      }
+
+      // Panel 3 displays final stats summary
+      document.getElementById("challenge-caption").textContent = "BIO-METRICS SUMMARY";
+      const choicePanel = document.getElementById("comic-choices-panel");
+      const stats = (state.player && state.player.stats) ? state.player.stats : { strength: 50, intelligence: 50, charisma: 50 };
+      choicePanel.innerHTML = `
+        <div style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-body); display: flex; flex-direction: column; gap: 8px;">
+          <div>STRENGTH: <span style="color: var(--cyber-cyan);">${stats.strength}/100</span></div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 2px;"><div style="width: ${stats.strength}%; height: 100%; background: var(--cyber-cyan);"></div></div>
+          <div>INTELLIGENCE: <span style="color: var(--cyber-magenta);">${stats.intelligence}/100</span></div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 2px;"><div style="width: ${stats.intelligence}%; height: 100%; background: var(--cyber-magenta);"></div></div>
+          <div>CHARISMA: <span style="color: var(--cyber-green);">${stats.charisma}/100</span></div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 2px;"><div style="width: ${stats.charisma}%; height: 100%; background: var(--cyber-green);"></div></div>
+        </div>
+      `;
+
+      // Panel 4 displays Return Deck button
+      const panel4 = document.getElementById("panel-resolution");
+      panel4.classList.remove("locked");
+      document.getElementById("resolution-pending-overlay").style.display = "none";
+      document.getElementById("dice-roller-inline").style.display = "none";
+
+      const sfx = document.getElementById("comic-sfx-text");
+      sfx.textContent = "SYS_OK";
+      sfx.className = "comic-sfx-overlay active sfx-success";
+
+      const container = document.getElementById("outcome-container");
+      const badge = document.getElementById("outcome-status-badge");
+      const narration = document.getElementById("outcome-narration-text");
+      const feedbackName = document.getElementById("outcome-speech-speaker");
+      const feedbackText = document.getElementById("outcome-speech-text");
+      const continueBtn = document.getElementById("dice-continue-btn");
+
+      container.style.display = "flex";
+      badge.textContent = "CAMPAIGN COMPLETE";
+      badge.className = "outcome-status-badge success";
+      narration.textContent = "With the mainframe files synced, you purge regional traces and slide back into the rain of District 09.";
+      
+      feedbackName.textContent = "AI_CORE_OMEGA";
+      feedbackText.textContent = `"Memory buffers fully restored. Welcome back to the grid."`;
+
+      continueBtn.textContent = "RETURN TO SYSTEM DECK";
+      continueBtn.className = "btn-dice-continue";
+      continueBtn.onclick = () => {
+        window.location.href = "index.html";
+      };
+    }
+
+    async function syncToDatabase() {
+      const username = localStorage.getItem("neural_username");
+      if (!username) return;
+
+      try {
+        await fetch("/api/save_game", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: username,
+            state: state
+          })
+        });
+      } catch (err) {
+        console.error("Database sync error:", err);
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast-notification");
+      toast.textContent = message;
+      toast.style.display = "flex";
+
+      if (window.toastTimeout) clearTimeout(window.toastTimeout);
+      window.toastTimeout = setTimeout(() => {
+        toast.style.display = "none";
+      }, 2500);
+    }
+
+    document.addEventListener("DOMContentLoaded", loadSessionAndProgress);
+  </script>
+</body>
+</html>

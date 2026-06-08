@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neural Link | Neo-Tokyo RPG Deck</title>
+  <meta name="description" content="Access the Neural Link interface to navigate District 09, manage Elias Vance's cybernetic status, track system logs, and interface with the AI agent.">
+  
+  <!-- Futuristic Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Scanline CRT Effect -->
+  <div class="scanlines"></div>
+
+  <!-- Main Terminal Deck Layout -->
+  <div class="deck-layout" id="terminal-deck">
+    
+    <!-- PANEL 1: NARRATIVE GAMEPLAY -->
+    <main class="deck-panel active" id="panel-narrative">
+      <header class="panel-header">
+        <div class="header-logo"><i class="fa-solid fa-network-wired"></i> NEURAL_LINK</div>
+        <div class="system-status">SYS_OK</div>
+      </header>
+      
+      <div class="banner-wrapper" id="cctv-banner-container">
+        <img id="narrative-banner" src="cyberpunk_street_banner.png" alt="Neo-Tokyo Street">
+        <video id="narrative-video" loop muted playsinline style="display: none; width: 100%; height: 100%; object-fit: cover;"></video>
+        <canvas id="cctv-effects-canvas" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+        
+        <div class="district-badge">LOCATION: <span id="location-name">DISTRICT_09</span></div>
+
+        <!-- CCTV Interface Overlay -->
+        <div class="cctv-hud" id="cctv-hud-panel" style="display: none;">
+          <div class="cctv-hud-header">
+            <span class="cctv-rec"><i class="fa-solid fa-circle"></i> FEED_LIVE</span>
+            <span id="cctv-cam-id">CAM_01_STREET</span>
+          </div>
+          <div class="cctv-hud-footer">
+            <span id="cctv-telemetry">SYS_OK | TRACKING TARGET</span>
+          </div>
+        </div>
+
+        <!-- CCTV Control Buttons -->
+        <div class="cctv-controls">
+          <button class="cctv-btn" id="toggle-cctv-feed" title="Toggle Surveillance Feed">
+            <i class="fa-solid fa-video"></i> <span id="cctv-toggle-text">ACTIVATE FEED</span>
+          </button>
+          <button class="cctv-btn" id="transition-comic-mode" onclick="window.location.href='story.html'" title="Switch to Visual Comic Mode" style="border-color: var(--cyber-magenta); color: var(--cyber-magenta);">
+            <i class="fa-solid fa-book-open"></i> <span>COMIC MODE</span>
+          </button>
+          <div class="cctv-cam-switcher" id="cctv-switcher-group" style="display: none;">
+            <button class="cctv-btn-arrow" id="cctv-prev-cam" title="Previous Camera"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="cctv-btn-arrow" id="cctv-next-cam" title="Next Camera"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel-content scrollable">
+        <h1 class="chapter-title" id="story-title">The Obsidian Rain</h1>
+        
+        <div class="narrative-log" id="story-log-container">
+          <!-- Story history dynamically generated -->
+        </div>
+
+        <!-- Predefined Action Options -->
+        <div class="cyber-options-list" id="predefined-options-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+      
+      <!-- Loader overlay inside Narrative Panel -->
+      <div class="loader-overlay" id="story-loader" style="display: none;">
+        <div class="loader-content">
+          <div class="cyber-spinner"></div>
+          <span class="loader-text">Decrypting data streams...</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 2: CHARACTER PROFILE -->
+    <section class="deck-panel" id="panel-profile">
+      <header class="panel-header">
+        <div class="header-logo"><i class="fa-solid fa-user-gear"></i> NEURAL_LINK</div>
+        <div class="system-status">BIOMETRICS_OK</div>
+      </header>
+      
+      <div class="panel-content scrollable">
+        <div class="profile-summary">
+          <h2 class="profile-name" id="player-name">ELIAS_VANCE</h2>
+          <span class="profile-level" id="player-level">[LVL_24 OPERATIVE]</span>
+        </div>
+        
+        <div class="avatar-card">
+          <img id="operative-portrait" src="cyberpunk_operative_portrait.png" alt="Elias Vance Portrait">
+          <div class="id-tag">ID: #008-EVANCE</div>
+        </div>
+
+        <!-- Core Attributes -->
+        <div class="attributes-section">
+          <h3>CORE_ATTRIBUTES</h3>
+          
+          <div class="attr-bar-container">
+            <div class="attr-bar-labels">
+              <span>STRENGTH</span>
+              <span id="strength-val">64/100</span>
+            </div>
+            <div class="attr-bar-outer">
+              <div class="attr-bar-inner strength" id="strength-bar" style="width: 64%;"></div>
+            </div>
+          </div>
+          
+          <div class="attr-bar-container">
+            <div class="attr-bar-labels">
+              <span>INTELLIGENCE</span>
+              <span id="intelligence-val">88/100</span>
+            </div>
+            <div class="attr-bar-outer">
+              <div class="attr-bar-inner intelligence" id="intelligence-bar" style="width: 88%;"></div>
+            </div>
+          </div>
+          
+          <div class="attr-bar-container">
+            <div class="attr-bar-labels">
+              <span>CHARISMA</span>
+              <span id="charisma-val">42/100</span>
+            </div>
+            <div class="attr-bar-outer">
+              <div class="attr-bar-inner charisma" id="charisma-bar" style="width: 42%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cargo Hold Grid -->
+        <div class="cargo-section">
+          <div class="cargo-header">
+            <h3>CARGO_HOLD</h3>
+            <span class="cargo-count" id="cargo-count-text">12 / 16 SLOTS</span>
+          </div>
+          <div class="cargo-grid" id="inventory-grid">
+            <!-- Rendered dynamically -->
+          </div>
+          
+          <!-- Selected item detail drawer -->
+          <div class="cargo-detail-card" id="item-detail-panel">
+            <p class="empty-cargo-text">Select a cargo slot to query status...</p>
+          </div>
+        </div>
+
+        <!-- Active Narrative Threads (Quests) -->
+        <div class="threads-section">
+          <h3>ACTIVE_NARRATIVE_THREADS</h3>
+          <div class="threads-list" id="quests-list-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 3: WORLD MAP -->
+    <section class="deck-panel" id="panel-map">
+      <header class="panel-header">
+        <div class="header-logo"><i class="fa-solid fa-map-location-dot"></i> NEURAL_LINK</div>
+        <div class="system-status">GPS_ACTIVE</div>
+      </header>
+      
+      <div class="panel-content scrollable">
+        <div class="map-summary">
+          <span class="map-log-id">DATASET_LOG_042</span>
+          <h2 class="map-title">NEO-TOKYO</h2>
+          <span class="map-subtitle">DISTRICT OVERVIEW</span>
+        </div>
+        
+        <div class="map-desc-box">
+          <span class="desc-heading">DESCRIPTION</span>
+          <p class="desc-body">Select a discovered location on the map to view intel, threat levels, and available transport options. The grid remains live.</p>
+        </div>
+
+        <div class="threat-indicator">
+          <span>THREAT LEVEL</span>
+          <span class="threat-badge" id="threat-level-badge">LOW</span>
+        </div>
+
+        <!-- Radar Visualizer -->
+        <div class="radar-card">
+          <div class="radar-controls">
+            <button class="zoom-btn" id="map-zoom-in" title="Zoom In">+</button>
+            <button class="zoom-btn" id="map-zoom-out" title="Zoom Out">-</button>
+          </div>
+          <div class="radar-viewport">
+            <svg class="radar-svg" id="world-map-svg" width="100%" height="100%">
+              <!-- Rendered dynamically -->
+            </svg>
+          </div>
+        </div>
+
+        <!-- Travel Options -->
+        <div class="travel-section">
+          <span class="section-label">TRAVEL OPTIONS</span>
+          <ul class="travel-options-list" id="travel-options-container">
+            <li class="travel-item active" id="transit-maglev">
+              <span class="travel-name">MAG-LEV TRANSIT</span>
+              <span class="travel-eta">6m</span>
+            </li>
+            <li class="travel-item locked" id="transit-blackcab">
+              <span class="travel-name">BLACK CAB</span>
+              <span class="travel-eta"><i class="fa-solid fa-lock"></i> LOCKED</span>
+            </li>
+            <li class="travel-item" id="transit-streetrun">
+              <span class="travel-name">STREET RUN</span>
+              <span class="travel-eta">12m</span>
+            </li>
+          </ul>
+        </div>
+
+        <button class="btn-deployment" id="initiate-deployment-btn">
+          &lt; INITIATE DEPLOYMENT &gt;
+        </button>
+      </div>
+    </section>
+
+    <!-- PANEL 4: NEURAL TERMINAL -->
+    <section class="deck-panel" id="panel-terminal">
+      <header class="panel-header">
+        <div class="header-logo"><i class="fa-solid fa-terminal"></i> NEURAL_LINK</div>
+        <div class="system-status">SECURE</div>
+      </header>
+      
+      <div class="panel-content terminal-wrapper">
+        <div class="terminal-session-info">
+          <span>SESSION: #AI_002_OMEGA</span>
+          <span><i class="fa-solid fa-stopwatch"></i> 0.04ms</span>
+          <span><i class="fa-solid fa-shield-halved"></i> SECURE</span>
+        </div>
+        
+        <div class="terminal-screen" id="terminal-screen-container">
+          <!-- Terminal logs, commands, rolls and AI chatter -->
+        </div>
+
+        <div class="terminal-input-container">
+          <span class="terminal-prompt">&gt;</span>
+          <input type="text" id="custom-action-input" placeholder="Type a command or query the AI..." autocomplete="off">
+          <button id="custom-action-btn" class="terminal-send-btn" title="Execute terminal command">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Bottom Navigation Bar (Visible on mobile/tablet) -->
+  <nav class="bottom-nav-bar" id="mobile-navigation">
+    <button class="nav-item active" data-target="panel-narrative">
+      <i class="fa-solid fa-book-open"></i>
+      <span>NARRATIVE</span>
+    </button>
+    <button class="nav-item" data-target="panel-profile">
+      <i class="fa-solid fa-user-ninja"></i>
+      <span>STATUS</span>
+    </button>
+    <button class="nav-item" data-target="panel-map">
+      <i class="fa-solid fa-location-crosshairs"></i>
+      <span>MAP</span>
+    </button>
+    <button class="nav-item" data-target="panel-terminal">
+      <i class="fa-solid fa-square-terminal"></i>
+      <span>TERMINAL</span>
+    </button>
+  </nav>
+
+  <!-- Engine Config Settings Modal/Drawer (Floating trigger button at bottom right on desktop) -->
+  <button id="settings-trigger-btn" class="floating-settings-btn" title="System Settings">
+    <i class="fa-solid fa-gears"></i>
+  </button>
+
+  <div class="settings-drawer" id="settings-drawer-container">
+    <div class="drawer-header">
+      <h3>ENGINE CONFIG</h3>
+      <button id="settings-close-btn" class="close-drawer-btn">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <div class="form-group">
+        <label for="engine-mode-select">Game Engine Mode</label>
+        <select id="engine-mode-select" class="form-control">
+          <option value="offline">Offline Controller (Campaign)</option>
+          <option value="online">Online Controller (Gemini AI)</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="api-key-group" style="display: none;">
+        <label for="gemini-api-key-input">Gemini API Key</label>
+        <div class="api-key-input-container">
+          <input type="password" id="gemini-api-key-input" class="form-control" placeholder="AIzaSy...">
+          <button id="toggle-key-visibility" type="button" class="btn-eye-toggle">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+        <p class="help-text">Saved locally in your browser storage.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="story-tone-select">Narrator Style</label>
+        <select id="story-tone-select" class="form-control">
+          <option value="cyber-noir">Grim Cyber-Noir</option>
+          <option value="high-tech">High-Tech Operative</option>
+          <option value="glitch-matrix">Broken Glitch/Matrix</option>
+          <option value="satirical">Satirical AI Core</option>
+        </select>
+      </div>
+
+      <div class="settings-actions">
+        <button id="logout-session-btn" class="btn-logout-deck" style="width: 100%; margin-bottom: 8px;">
+          <i class="fa-solid fa-power-off"></i> DISCONNECT NEURAL LINK
+        </button>
+        <button id="reset-game-btn" class="btn-reset-system">
+          <i class="fa-solid fa-trash-can-arrow-up"></i> RESET SYSTEM DECK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Alert System -->
+  <div id="toast-notification" class="toast-message" style="display: none;"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
